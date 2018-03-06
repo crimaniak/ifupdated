@@ -1,6 +1,6 @@
 {
 	"name" : "ifupdated",
-	"description" : "Hello World - A minimal DUB bundle.",
+	"description" : "IfUpdated - utility to run command only when source files was changed from last run",
 	"dependencies" : {
 	}
 }

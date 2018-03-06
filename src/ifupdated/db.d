@@ -27,36 +27,32 @@ unittest
 
 struct Db
 {
-	import std.file;
-	import std.stdio;
+	import std.file : exists, isFile, timeLastModified, mkdirRecurse;
+	import std.stdio : File;
+	import std.digest.digest: toHexString;
 	
-	string[] args;
-	string filename;
+	string[] args;   // command and arguments
+	string filename; // database filename for this command/arguments combo
 	
 	this(string[] args)
 	{
 		this.args = args;
-		filename = getName(makeHash(args));
+		filename = getName(args.makeHash);
 	}
 
-	static string getBase()
+	static string getBaseDir()
 	{
-		import std.digest.digest: toHexString;
-		
 		return (getHome~"/.ifupdated/").to!string;
 	}
 
 	static string getName(ubyte[16] hash)
 	{
-		import std.digest.digest: toHexString;
-		
-		return (getBase~hash.toHexString).to!string;
+		return (getBaseDir~hash.toHexString).to!string;
 	}
 
 	void update(T)(T files)
 	{
-		
-		mkdirRecurse(getBase);
+		mkdirRecurse(getBaseDir);
 		
 		auto file = filename.File("w+");
 		
@@ -65,7 +61,7 @@ struct Db
 		file.close;	
 	}	
 
-	bool wasUpdated()
+	bool wasUpdatedOrNew()
 	{
 		import std.algorithm: any;
 		
