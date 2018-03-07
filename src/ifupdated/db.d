@@ -70,7 +70,7 @@ struct Db
 			
 		auto lastRun = filename.timeLastModified;
 		
-		return filename.File.byLine.any!(name => name.timeLastModified > lastRun);
+		return filename.File.byLine.any!(name => !name.exists || name.timeLastModified > lastRun);
 	}	
 }
 
