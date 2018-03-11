@@ -9,5 +9,5 @@ int main(string[] args)
         writeln("Syntax: ifupdated command_to_run");
         return 0;
     }
-    return run(args);
+    return run(args[1..$]);
 }
