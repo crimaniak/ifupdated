@@ -2,7 +2,7 @@ module ifupdated.db;
 
 import std.conv : to;
 
-ubyte[16] makeHash(string[] args)
+ubyte[16] makeHash(string[] args, string cwd)
 {
 	import std.digest.md : MD5;
 	import std.algorithm : each;
@@ -14,15 +14,18 @@ ubyte[16] makeHash(string[] args)
 		digest.put(cast(ubyte[])s);
 		digest.put(0);
 	}
+	digest.put(cast(ubyte[])cwd);
 	return digest.finish;
 }
 
 unittest
 {
-	auto a = makeHash(["command1","-a","-b"]);
-	auto b = makeHash(["command1","-a-","b"]);
+	auto a = makeHash(["command1","-a","-b"], "");
+	auto b = makeHash(["command1","-a-","b"], "");
+	auto c = makeHash(["command1","-a","-b"], "/");
 	
 	assert(a != b);
+	assert(a != c);
 }
 
 struct Db
@@ -32,12 +35,14 @@ struct Db
 	import std.digest.digest: toHexString;
 	
 	string[] args;   // command and arguments
+	string cwd;
 	string filename; // database filename for this command/arguments combo
 	
-	this(string[] args)
+	this(string[] args, string cwd)
 	{
 		this.args = args;
-		filename = getName(args.makeHash);
+		this.cwd = cwd;
+		filename = getName(makeHash(args, cwd));
 	}
 
 	static string getBaseDir()

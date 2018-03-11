@@ -1,13 +1,12 @@
 module ifupdated.runner;
 
-//import std.stdio;
 import std.conv: to;
 
 import ifupdated.db;
 
-int run(string[] args)
+int run(string[] args, string cwd)
 {
-	Db db = Db(args);
+	Db db = Db(args, cwd);
 	
 	if(db.wasUpdatedOrNew())
 		return runAndCollectInfo(db); 
@@ -36,7 +35,6 @@ int runAndCollectInfo(ref Db db)
 		collectInfo(db, logFilename);
 	return exitCode; 
 }
-
 
 void collectInfo(ref Db db, string logFilename)
 {
