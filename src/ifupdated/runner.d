@@ -4,11 +4,11 @@ import std.conv: to;
 
 import ifupdated.db;
 
-int run(string[] args, string cwd)
+int run(const string[] args, string[] targets, string cwd)
 {
 	Db db = Db(args, cwd);
 	
-	if(db.wasUpdatedOrNew())
+	if(db.wasUpdatedOrNew || targets.someMissing)
 		return runAndCollectInfo(db); 
 
 	return 0;
@@ -85,4 +85,12 @@ nextLine:
 		sources.removeKey(file);
 
 	db.update(sources);
+}
+
+bool someMissing(const string[] targets)
+{
+	import std.file: exists;
+	import std.algorithm: any;
+	
+	return targets.any!(t => !t.exists);
 }

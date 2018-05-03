@@ -2,7 +2,7 @@ module ifupdated.db;
 
 import std.conv : to;
 
-ubyte[16] makeHash(string[] args, string cwd)
+ubyte[16] makeHash(const string[] args, string cwd)
 {
 	import std.digest.md : MD5;
 	import std.algorithm : each;
@@ -34,11 +34,11 @@ struct Db
 	import std.stdio : File;
 	import std.digest.digest: toHexString;
 	
-	string[] args;   // command and arguments
+	const string[] args;   // command and arguments
 	string cwd;
 	string filename; // database filename for this command/arguments combo
 	
-	this(string[] args, string cwd)
+	this(const string[] args, string cwd)
 	{
 		this.args = args;
 		this.cwd = cwd;
@@ -50,7 +50,7 @@ struct Db
 		return (getHome~"/.ifupdated/").to!string;
 	}
 
-	static string getName(ubyte[16] hash)
+	static string getName(const ubyte[16] hash)
 	{
 		return (getBaseDir~hash.toHexString).to!string;
 	}
