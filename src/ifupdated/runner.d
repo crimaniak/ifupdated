@@ -45,7 +45,7 @@ void collectInfo(ref Db db, string logFilename)
 	import std.string: split;
 
 	RedBlackTree!string sources = new RedBlackTree!string;
-	RedBlackTree!string derived = new RedBlackTree!string;
+	RedBlackTree!string targets = new RedBlackTree!string;
 	
 	// 16565 open("/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
 	auto mask = ctRegex!`^(?:\d+\s+)?open\("([^"]+)", (\S+)(,\s+\d+)?\)\s+=\s+(\d+)`;
@@ -53,7 +53,6 @@ void collectInfo(ref Db db, string logFilename)
 nextLine:
 	foreach(line; logFilename.File.byLine)
 	{
-		// writeln(line);
 		auto result = line.matchFirst(mask);
 		if(result.empty())
 			continue;
@@ -65,7 +64,7 @@ nextLine:
 				continue nextLine;		
 			} else if(attr == "O_WRONLY" || attr == "O_CREAT" || attr == "O_RDWR")
 			{
-				derived.insert(result[1].to!string);
+				targets.insert(result[1].to!string);
 				continue nextLine;
 			}
 		throw new Exception("Can't parse attributes: " ~ line.to!string); 	
@@ -74,17 +73,24 @@ nextLine:
 	logFilename.remove;
 	
 	// @todo: read from config
-	auto nonSource = ctRegex!`^/(:?etc|proc|dev)/`;
+	auto nonSource = ctRegex!`^/(:?etc|proc|dev|tmp)/`;
 	
 	// no range interface for RBTree
-	foreach(file; sources)
-		if(!file.matchFirst(nonSource).empty)
-			derived.insert(file);
 
-	foreach(file; derived)
+	foreach(file; targets)
 		sources.removeKey(file);
 
-	db.update(sources);
+	SavedData toSave;
+	
+	foreach(file; sources)
+		if(file.matchFirst(nonSource).empty)
+			toSave.sources ~= file;
+
+	foreach(file; targets)
+		if(file.matchFirst(nonSource).empty)
+			toSave.targets ~= file;
+
+	db.update(toSave);
 }
 
 bool someMissing(const string[] targets)
