@@ -19,7 +19,8 @@ int runAndCollectInfo(ref Db db)
 	import core.stdc.stdio: tmpnam;
 	import std.algorithm: map;
 	import std.array: array;
-	import std.process: spawnProcess, wait;
+	import std.process: spawnProcess, wait, ProcessException;
+	import std.stdio: stderr;
 	
 	// File itself will be created by external utility so tmpnam is used
 	string logFilename = tmpnam(null).to!string;
@@ -29,11 +30,25 @@ int runAndCollectInfo(ref Db db)
 	
 	fullArgs ~= db.args.map!(arg => cast(char[]) arg).array;
 
-	auto p = fullArgs.spawnProcess;
-	auto exitCode = p.wait;
-	if (exitCode == 0)
-		collectInfo(db, logFilename);
-	return exitCode; 
+	try 
+	{
+		auto p = fullArgs.spawnProcess;
+		
+		auto exitCode = p.wait;
+		if (exitCode == 0)
+			collectInfo(db, logFilename);
+		return exitCode; 
+		
+	} catch (ProcessException e) 
+	{
+		if(e.msg == "Executable file not found: strace")
+		{
+			stderr.writeln("Error: strace utility is not found");
+			stderr.writeln("Please install strace utility to continue");
+			return 1;
+		}
+		throw e;
+	}
 }
 
 void collectInfo(ref Db db, string logFilename)
@@ -47,7 +62,7 @@ void collectInfo(ref Db db, string logFilename)
 	RedBlackTree!string sources = new RedBlackTree!string;
 	RedBlackTree!string targets = new RedBlackTree!string;
 	
-	// 16565 open("/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+	// example: 16565 open("/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
 	auto mask = ctRegex!`^(?:\d+\s+)?open\("([^"]+)", (\S+)(,\s+\d+)?\)\s+=\s+(\d+)`;
 	
 nextLine:
