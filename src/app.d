@@ -4,7 +4,7 @@ int main(string[] args)
     import std.file : getcwd;
     import std.conv : to;
     import std.regex : ctRegex, matchFirst;
-    
+
     import ifupdated.runner : run;
 
     if (args.length < 2)

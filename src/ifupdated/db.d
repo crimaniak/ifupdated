@@ -2,7 +2,7 @@ module ifupdated.db;
 
 import std.conv : to;
 
-enum formatVersion="1.0";
+enum formatVersion = "1.0";
 
 @safe @nogc ubyte[16] makeHash(const string[] args, string cwd)
 {
@@ -36,43 +36,42 @@ unittest
 struct SavedData
 {
     import std.stdio : File;
-	import std.container.rbtree : RedBlackTree;
-	
-	string[] sources, targets;
-	
-	this(string filename)
-	{
+    import std.container.rbtree : RedBlackTree;
+
+    string[] sources, targets;
+
+    this(string filename)
+    {
         import std.algorithm : each;
 
-		bool toSources;
-		filename.File.byLineCopy.each!((string name){
-			if(name.length == 0)
-			{
-				toSources = true;
-				return;
-			}	
-			if(toSources)
-				sources ~= name;
-			else	
-				targets ~= name;	
-		});
-	}
-	
-	
-	@safe void saveTo(string filename) const
-	{
+        bool toSources;
+        filename.File.byLineCopy.each!((string name) {
+            if (name.length == 0)
+            {
+                toSources = true;
+                return;
+            }
+            if (toSources)
+                sources ~= name;
+            else
+                targets ~= name;
+        });
+    }
+
+    @safe void saveTo(string filename) const
+    {
         auto file = filename.File("w+");
-		
+
         foreach (name; targets)
             file.writeln(name);
-        file.writeln("");    
+        file.writeln("");
         foreach (name; sources)
             file.writeln(name);
-            
+
         file.close;
-	}
-	
-} 
+    }
+
+}
 
 struct Db
 {
@@ -105,7 +104,7 @@ struct Db
     {
         mkdirRecurse(getBaseDir);
 
-		data.saveTo(filename);
+        data.saveTo(filename);
     }
 
     bool wasUpdatedOrNew()
@@ -117,10 +116,10 @@ struct Db
 
         auto lastRun = filename.timeLastModified;
 
-		SavedData data = SavedData(filename);
+        SavedData data = SavedData(filename);
 
-        return data.sources.any!(name => !name.exists || name.timeLastModified > lastRun) 
-	        || data.targets.any!(name => !name.exists);
+        return data.sources.any!(name => !name.exists
+                || name.timeLastModified > lastRun) || data.targets.any!(name => !name.exists);
     }
 }
 
