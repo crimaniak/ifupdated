@@ -1,6 +1,10 @@
 {
 	"name" : "ifupdated",
 	"description" : "IfUpdated - utility to run command only when source files was changed from last run",
+	"authors": [
+    	"Alexey Kulentsov"
+    ],
+	"license": "BSL-1.0",
 	"dependencies" : {
 	}
 }
