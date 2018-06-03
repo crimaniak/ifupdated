@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/crimaniak/ifupdated.svg)](https://travis-ci.org/crimaniak/ifupdated)
+[![license](https://img.shields.io/github/license/crimaniak/ifupdated.svg)](https://github.com/crimaniak/ifupdated/blob/master/LICENSE)
+
 # ifupdated
 
 IfUpdated - UNIX-only utility to run command only when source files was changed from last run
