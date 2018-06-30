@@ -3,15 +3,15 @@
 
 # ifupdated
 
-IfUpdated - UNIX-only utility to run command only when source files was changed from last run
+IfUpdated - UNIX-only utility to run command only when source files were changed after the last run
 
 ## How it works
 
-When the command is started, the utility collects information about all the files used and divides them into two categories - source code and results, depending on the opening parameters. This data is saved in a separate file for each combination of the running command and its parameters, and the next time it is used to determine if the source files have changed since the last time it was run. In the event that the files have not changed, the command is canceled. This utility implements some of the functionality of the utility 'make', and in combination with shell files can replace it in simple cases.
+When the command is started, the utility collects information about all the files used and divides them into two categories - source code and results, depending on the opening parameters. This data is saved in a separate file for each combination of the running command and its parameters. When it is run for the next time, this data is used to determine if the source files have changed since the last time it was run. In the case that the files have not changed, the command is cancelled. This utility implements some of the functionality of the utility 'make', and in the combination with shell files it can replace 'make' in simple cases.
 
 To collect information, the [strace](https://strace.io/) utility is used, so it must be installed for the correct operation of the program.
 
 ## Restrictions
 
 * The presence of a change is determined by the time (Last Modified), not by content.
-* To reliably detect changes, the running command must use all the files on which the result depends. Therefore, the utility will work badly if the list of source files is not fixed and depends on their presence on the disk.
+* To detect changes reliably, the running command must use all the files the result depends on. The utility will work unreliable if the list of dependencies is not determined by the source files content only. 
